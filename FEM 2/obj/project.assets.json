@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Skromer\\source\\repos\\FEM 2\\FEM 2\\FEM 2.csproj",
+      "projectUniqueName": "C:\\Users\\Skromer\\source\\repos\\FEM-2\\FEM 2\\FEM 2.csproj",
       "projectName": "FEM 2",
-      "projectPath": "C:\\Users\\Skromer\\source\\repos\\FEM 2\\FEM 2\\FEM 2.csproj",
+      "projectPath": "C:\\Users\\Skromer\\source\\repos\\FEM-2\\FEM 2\\FEM 2.csproj",
       "packagesPath": "C:\\Users\\Skromer\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Skromer\\source\\repos\\FEM 2\\FEM 2\\obj\\",
+      "outputPath": "C:\\Users\\Skromer\\source\\repos\\FEM-2\\FEM 2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Skromer\\AppData\\Roaming\\NuGet\\NuGet.Config",

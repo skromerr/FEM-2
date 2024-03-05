@@ -53,9 +53,9 @@ public class Solver
          z = r + beta * z;
       }
 
-      //Console.WriteLine($"Last iteration - {iter}\n" +
-      //   $"Residual norm - {r.Norm() / vectorNorm}\n {eps}");
-   }
+        Console.WriteLine($"Last iteration - {iter}\n" +
+           $"Residual norm - {r.Norm() / vectorNorm}\n {eps}");
+    }
 
    public void PrintSolution()
    {

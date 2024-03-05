@@ -3,7 +3,7 @@
 Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 string spaceGridPath = "C:\\Users\\Skromer\\source\\repos\\FEM 2\\BinaryConvert\\";
 string materialPath = "C:\\TELMA\\PRIMER\\";
-Grid grid = new(spaceGridPath, materialPath);
+Grid grid = new(spaceGridPath, materialPath, true);
 FEM fem = new(grid);
 fem.Compute();
 //fem.PrintSolution();

@@ -12,3 +12,18 @@ C:\Users\Skromer\source\repos\FEM 2\FEM 2\obj\Debug\net8.0\refint\FEM 2.dll
 C:\Users\Skromer\source\repos\FEM 2\FEM 2\obj\Debug\net8.0\FEM 2.pdb
 C:\Users\Skromer\source\repos\FEM 2\FEM 2\obj\Debug\net8.0\FEM 2.genruntimeconfig.cache
 C:\Users\Skromer\source\repos\FEM 2\FEM 2\obj\Debug\net8.0\ref\FEM 2.dll
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\bin\Debug\net8.0\FEM 2.exe
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\bin\Debug\net8.0\FEM 2.deps.json
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\bin\Debug\net8.0\FEM 2.runtimeconfig.json
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\bin\Debug\net8.0\FEM 2.dll
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\bin\Debug\net8.0\FEM 2.pdb
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.AssemblyInfoInputs.cache
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.AssemblyInfo.cs
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.csproj.CoreCompileInputs.cache
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.sourcelink.json
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.dll
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\refint\FEM 2.dll
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.pdb
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.genruntimeconfig.cache
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\ref\FEM 2.dll

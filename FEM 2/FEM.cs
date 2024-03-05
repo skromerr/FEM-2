@@ -4,8 +4,6 @@ namespace UMFCourseProject;
 
 public class FEM
 {
-    public delegate double Basis(Point2D point);
-
     private const double mu0 = 4 * Math.PI * 1e-7;
     private Grid grid;
     private SparseMatrix globalMatrix;
@@ -19,9 +17,9 @@ public class FEM
     private Vector solution;
     private FirstCondition[] firstConditions;
     private SecondCondition[] secondConditions;
-    private Basis[] basis;
-    private Basis[] dbasisdx;
-    private Basis[] dbasisdy;
+    private Func<Point2D, double>[] basis;
+    private Func<Point2D, double>[] dbasisdx;
+    private Func<Point2D, double>[] dbasisdy;
     private string condPath => "conditions.txt";
 
     public FEM(Grid grid)
@@ -29,20 +27,26 @@ public class FEM
         this.grid = grid;
         alphas = new(3);
 
-        // квадратичный
-        //basis = [Psi1, Psi2, Psi3, Psi4, Psi5, Psi6];
-        //dbasisdx = [dPsi1dx, dPsi2dx, dPsi3dx, dPsi4dx, dPsi5dx, dPsi6dx];
-        //dbasisdy = [dPsi1dy, dPsi2dy, dPsi3dy, dPsi4dy, dPsi5dy, dPsi6dy];
 
-        // линейный
-        basis = [_l1, _l2, _l3];
-        dbasisdx = [_dl1dx, _dl2dx, _dl3dx];
-        dbasisdy = [_dl1dy, _dl2dy, _dl3dy];
+        if (grid.Elements[0].Length == 7)
+        {
+            // квадратичный
+            basis = [Psi1, Psi2, Psi3, Psi4, Psi5, Psi6];
+            dbasisdx = [dPsi1dx, dPsi2dx, dPsi3dx, dPsi4dx, dPsi5dx, dPsi6dx];
+            dbasisdy = [dPsi1dy, dPsi2dy, dPsi3dy, dPsi4dy, dPsi5dy, dPsi6dy];
+        }
+        else
+        {
+            // линейный
+            basis = [_l1, _l2, _l3];
+            dbasisdx = [_dl1dx, _dl2dx, _dl3dx];
+            dbasisdy = [_dl1dy, _dl2dy, _dl3dy];
+        }
 
 
         stiffnessMatrix = new(basis.Length);
         localVector = new(basis.Length);
-        slae = new Solver(1000, 1e-16);
+        slae = new Solver(100000, 1e-16);
 
 
 
@@ -65,13 +69,13 @@ public class FEM
 
         BuildPortrait();
         AssemblyGlobalMatrix();
-        AccountFirstConditionsWithBigNumber();
+        AccountFirstConditions();
 
         slae.SetSLAE(globalVector, globalMatrix);
         slae.CGM();
         Vector.Copy(slae.solution, solution);
 
-        PrintSolution();
+        //PrintSolution();
 
     }
 
@@ -177,7 +181,7 @@ public class FEM
 
             AssemblyLocalMatrixes();
 
-            stiffnessMatrix = 1 / (grid.Materials[grid.Elements[ielem][^1]].Mu) * stiffnessMatrix;
+            stiffnessMatrix = 1 / (grid.Materials[grid.Elements[ielem][^1]].Mu * mu0) * stiffnessMatrix;
 
             for (int i = 0; i < basis.Length; i++)
                 for (int j = 0; j < basis.Length; j++)
@@ -201,7 +205,7 @@ public class FEM
             localVector[i] = GaussTriangle(basis[i].Invoke);
         }
 
-        localVector = jValue / 10.0 * Math.Abs(DeterminantD()) * localVector;
+        localVector = jValue * Math.Abs(DeterminantD()) * localVector;
     }
 
     private void AddElementToVector(int ielem)
@@ -270,8 +274,9 @@ public class FEM
         for (int i = 0; i < stiffnessMatrix.Size; i++)
             for (int j = 0; j < stiffnessMatrix.Size; j++)
             {
-                Func<Point2D, double> func = Sum(Mult(dbasisdx[i], dbasisdx[j]), Mult(dbasisdy[i], dbasisdy[j])).Invoke;
+                Func<Point2D, double> func = Sum(Mult(dbasisdx[i], dbasisdx[j]), Mult(dbasisdy[i], dbasisdy[j]));
                 stiffnessMatrix[i, j] = GaussTriangle(func);
+                //stiffnessMatrix[i, j] = func(new Point2D(0, 0));
             }
         stiffnessMatrix = dD * stiffnessMatrix;
     }
@@ -495,9 +500,9 @@ public class FEM
         }
     }
 
-    public static Basis Mult(Basis fst, Basis scnd) 
+    public static Func<Point2D, double> Mult(Func<Point2D, double> fst, Func<Point2D, double> scnd) 
         => (point) => fst(point) * scnd(point);
-    public static Basis Sum(Basis fst, Basis scnd)
+    public static Func<Point2D, double> Sum(Func<Point2D, double> fst, Func<Point2D, double> scnd)
         => (point) => fst(point) + scnd(point);
 }
 

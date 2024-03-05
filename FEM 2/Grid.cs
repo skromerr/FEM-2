@@ -29,7 +29,7 @@ public class Grid
 
     private double _maxX, _maxY, _minX;
 
-    public Grid(string spaceGridPath, string materialsPath)
+    public Grid(string spaceGridPath, string materialsPath, bool isQuadraticBasis = false)
     {
         string coordsPath = spaceGridPath + "coords.txt";
         string elemsPath = spaceGridPath + "elemsTr.txt";
@@ -59,8 +59,12 @@ public class Grid
         {
 
             data = sr.ReadLine()!.Split().ToArray();
-            Elements = new int[Convert.ToInt32(data[0])].Select(_ => new int[4]).ToArray(); //линейный
-            //Elements = new int[Convert.ToInt32(data[0])].Select(_ => new int[7]).ToArray(); // квадратичный
+
+            if (!isQuadraticBasis)
+                Elements = new int[Convert.ToInt32(data[0])].Select(_ => new int[4]).ToArray(); //линейный
+            else 
+                Elements = new int[Convert.ToInt32(data[0])].Select(_ => new int[7]).ToArray(); // квадратичный
+            
             for (int i = 0; i < Elements.Length; i++)
             {
                 data = sr.ReadLine()!.Split(" ").ToArray();
@@ -95,10 +99,18 @@ public class Grid
             }
 
             if (FirstConditionNodes.Count != Convert.ToInt32(data[0])) { throw new NotImplementedException(); }
+
+            
         }
 
+        if (isQuadraticBasis)
+        {
+            Console.WriteLine($"Количество узлов под 1 краевым до добавления узлов от квадратичного базиса - {FirstConditionNodes.Count}");
 
-        //NumberNodes(); // для квадратичного базиса
+            NumberNodes(); // для квадратичного базиса
+
+            Console.WriteLine($"Количество узлов под 1 краевым после добавления узлов от квадратичного базиса - {FirstConditionNodes.Count}");
+        }
     }
 
     private void NumberNodes()
@@ -130,9 +142,9 @@ public class Grid
                     hashtable.Add(key[i], pointInfo);
                     Nodes.Add((Nodes[key[i].Item1] + Nodes[key[i].Item2]) / 2);
 
-                    if (Math.Abs(Nodes[num].X - _maxX) < 1e-10 ||
-                        Math.Abs(Nodes[num].X - _minX) < 1e-10 ||
-                        Math.Abs(Nodes[num].Y - _maxY) < 1e-10)
+                    if (Math.Abs(Nodes[^1].X - _maxX) < 1e-7 ||
+                        Math.Abs(Nodes[^1].X - _minX) < 1e-7 ||
+                        Math.Abs(Nodes[^1].Y - _maxY) < 1e-7)
                     {
                         FirstConditionNodes.Add(num);
                     }
