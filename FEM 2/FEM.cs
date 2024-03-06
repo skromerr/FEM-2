@@ -475,7 +475,7 @@ public class FEM
         }
         return -1;
     }
-    public double ValueAtPoint(Point2D point)
+    public double AzAtPoint(Point2D point)
     {
         double res = 0;
 
@@ -491,6 +491,23 @@ public class FEM
         }
         return res;
     }
+
+    public double ByAtPoint(Point2D point)
+    {
+        double hx = 1e-7;
+
+        return -(AzAtPoint(point + new Point2D(hx, 0)) - AzAtPoint(point - new Point2D(hx, 0))) / (2.0 * hx);
+    }
+
+    public double BxAtPoint(Point2D point)
+    {
+        double hy = 1e-7;
+
+        return (AzAtPoint(point + new Point2D(0, hy)) - AzAtPoint(point - new Point2D(0, hy))) / (2.0 * hy);
+    }
+
+    public double AbsBAtPoint(Point2D point)
+    => Math.Sqrt(Math.Pow(ByAtPoint(point),2) + Math.Pow(BxAtPoint(point), 2));
 
     public void PrintSolution()
     {

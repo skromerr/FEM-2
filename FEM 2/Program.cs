@@ -25,6 +25,6 @@ Point2D[] points =
     };
 for (int i = 0; i < points.Length; i++)
 {
-    double res = fem.ValueAtPoint(points[i]);
-    Console.WriteLine($"Значение вектор-потенциала в точке ({points[i].X};{points[i].Y}) равно {res:E11}.");
+    (double, double, double, double) res = (fem.AzAtPoint(points[i]), fem.BxAtPoint(points[i]), fem.ByAtPoint(points[i]), fem.AbsBAtPoint(points[i]));
+    Console.WriteLine($"Точка ( {points[i].X:E4}; {points[i].Y:E4} ): Az = {res.Item1:.0000E+00}\t  Bx = {res.Item2:.0000E+00}\t  By = {res.Item3:.0000E+00}\t |B| = {res.Item4:.0000E+00}.");
 }
