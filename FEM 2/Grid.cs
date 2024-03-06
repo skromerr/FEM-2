@@ -98,6 +98,8 @@ public class Grid
                 if (_minX > Nodes[nodeNum].X) _minX = Nodes[nodeNum].X;
             }
 
+            
+
             if (FirstConditionNodes.Count != Convert.ToInt32(data[0])) { throw new NotImplementedException(); }
 
             
@@ -105,11 +107,31 @@ public class Grid
 
         if (isQuadraticBasis)
         {
-            Console.WriteLine($"Количество узлов под 1 краевым до добавления узлов от квадратичного базиса - {FirstConditionNodes.Count}");
+            //int count1 = FirstConditionNodes.Count;
+            //Console.WriteLine($"Количество узлов под 1 краевым до добавления узлов от квадратичного базиса - {FirstConditionNodes.Count}");
 
             NumberNodes(); // для квадратичного базиса
 
-            Console.WriteLine($"Количество узлов под 1 краевым после добавления узлов от квадратичного базиса - {FirstConditionNodes.Count}");
+            //Console.WriteLine($"Количество узлов под 1 краевым после добавления узлов от квадратичного базиса - {FirstConditionNodes.Count}");
+
+            //List<double> Ys = new List<double>();
+            
+            //for (int i = 0; i < FirstConditionNodes.Count; i++)
+            //{
+            //    if (Math.Abs(Nodes[FirstConditionNodes[i]].X - _maxX) < 1e-7)
+            //        //Console.WriteLine($"X: {Nodes[FirstConditionNodes[i]].X} \t Y: {Nodes[FirstConditionNodes[i]].Y}");
+            //        Ys.Add(Nodes[FirstConditionNodes[i]].Y);
+            //    if (Math.Abs(Nodes[FirstConditionNodes[i]].X - _maxX) < 1e-7 && Math.Abs(Nodes[FirstConditionNodes[i]].Y - _maxY) < 1e-7)
+            //        Console.WriteLine($"X: {Nodes[FirstConditionNodes[i]].X} \t Y: {Nodes[FirstConditionNodes[i]].Y}");
+            //}
+
+            //Ys.Sort();
+            //Console.WriteLine($"Количество на правой границе : {Ys.Count}");
+            //for (int i = 0; i < Ys.Count;i++)
+            //{
+            //    Console.Write($"{Ys[i]:E5} \t");
+            //}
+            //Console.WriteLine("\nOUT");
         }
     }
 

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FEM 2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1da9a3d3c5a4da39e41e48e8a790eba3a3c0b71e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3317a739041f1536f6232a1109da5751019dd2f7")]
 [assembly: System.Reflection.AssemblyProductAttribute("FEM 2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FEM 2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
