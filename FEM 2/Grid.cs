@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Drawing;
 
-namespace UMFCourseProject;
+namespace FEM2;
 
 public struct Material
 {
