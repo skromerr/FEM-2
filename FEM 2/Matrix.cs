@@ -1,4 +1,4 @@
-﻿namespace UMFCourseProject;
+﻿namespace FEM2;
 
 public class Matrix
 {
@@ -60,4 +60,16 @@ public class Matrix
 
       return resultMatrix;
    }
+
+    public static void PrintMatrixToConsole(Matrix matrix)
+    {
+        for (int i = 0; i < matrix.Size; i++)
+        {
+            for (int j = 0; j < matrix.Size; j++)
+                Console.Write($"{matrix[i, j]:F5}\t");
+
+            Console.WriteLine();
+        }
+    }
 }
+

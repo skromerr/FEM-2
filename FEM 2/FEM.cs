@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace UMFCourseProject;
+namespace FEM2;
 
 public class FEM
 {
@@ -12,15 +12,16 @@ public class FEM
     private Matrix alphas;
     private Vector localVector;
     private Matrix stiffnessMatrix;
-    private Matrix massMatrix;
     private Point2D[] vertices;
     private Vector solution;
+    private Vector solutionPrev;
     private FirstCondition[] firstConditions;
-    private SecondCondition[] secondConditions;
     private Func<Point2D, double>[] basis;
     private Func<Point2D, double>[] dbasisdx;
     private Func<Point2D, double>[] dbasisdy;
-    private string condPath => "conditions.txt";
+    private Spline spline;
+    private bool isLinear = true;
+    (int maxIters, double eps, double delta) nonLinearParametres = (100, 1e-14, 1e-14);
 
     public FEM(Grid grid)
     {
@@ -46,12 +47,13 @@ public class FEM
 
         stiffnessMatrix = new(basis.Length);
         localVector = new(basis.Length);
-        slae = new Solver(100000, 1e-16);
+        slae = new Solver(50000, 1e-14);
 
 
 
         vertices = new Point2D[3];
         solution = new Vector(grid.Nodes.Count);
+        solutionPrev = new Vector(grid.Nodes.Count);
 
         SetBoundaryConditions();
     }
@@ -64,19 +66,60 @@ public class FEM
             firstConditions[i++] = new(grid.Nodes[node], node);
     }
 
+    public void SetSpline(Spline spline)
+    {
+        this.spline = spline;
+    }
+
+    public void SetNonlinearIterationParametres(int maxiters, double eps, double delta)
+    {
+        nonLinearParametres = (maxiters, eps, delta);
+    }
+
     public void Compute()
     {
-
+        int iter;
+        double residual = 0;
         BuildPortrait();
-        AssemblyGlobalMatrix();
-        AccountFirstConditions();
 
+        // Линейная задача
+        AssemblySLAE();
+        AccountFirstConditions();
         slae.SetSLAE(globalVector, globalMatrix);
         slae.CGM();
         Vector.Copy(slae.solution, solution);
 
-        //PrintSolution();
+        isLinear = false;
 
+        double relax = 1;
+
+        for (iter = 1; iter < nonLinearParametres.maxIters; iter++)
+        {
+            AssemblySLAE();
+            AccountFirstConditions();
+
+            residual = (globalMatrix * solution - globalVector).Norm() / globalVector.Norm();
+            
+            if ((solution - solutionPrev).Norm() / solution.Norm() < nonLinearParametres.delta)
+                break;
+
+            Vector.Copy(solution, solutionPrev);
+
+            if (residual < nonLinearParametres.eps)
+                break;
+            Console.WriteLine($"Итерация - {iter}\t Невязка - {residual:0.00e+00}");
+
+            slae.SetSLAE(globalVector, globalMatrix);
+            slae.CGM();
+            //Vector.Copy(slae.solution, solution);
+            solution = relax * slae.solution + (1 - relax) * solutionPrev;
+        }
+
+        //PrintSolution();
+        Console.WriteLine("Невязка");
+        Console.WriteLine($"{residual:0.00E+0}");
+        Console.WriteLine($"Количество итераций\n{iter}");
+        Console.WriteLine();
     }
 
 
@@ -168,10 +211,11 @@ public class FEM
         }
     }
 
-    private void AssemblyGlobalMatrix()
+    private void AssemblySLAE()
     {
         globalMatrix.Clear();
         globalVector.Fill(0);
+        double mu;
 
         for (int ielem = 0; ielem < grid.Elements.Length; ielem++)
         {
@@ -179,9 +223,19 @@ public class FEM
             vertices[1] = grid.Nodes[grid.Elements[ielem][1]];
             vertices[2] = grid.Nodes[grid.Elements[ielem][2]];
 
-            AssemblyLocalMatrixes();
+            AssemblyLocalMatrixes(ielem);
 
-            stiffnessMatrix = 1 / (grid.Materials[grid.Elements[ielem][^1]].Mu * mu0) * stiffnessMatrix;
+
+            mu = grid.Materials[grid.Elements[ielem][^1]].Mu * mu0;
+            if (grid.Elements[ielem][^1] == 1 && spline is not null)
+                //if (ielem % 2 == 0)
+                {
+                    Point2D massCenter = (grid.Nodes[grid.Elements[ielem][0]] + grid.Nodes[grid.Elements[ielem][1]] + grid.Nodes[grid.Elements[ielem][2]]) / 3.0;
+
+                    mu = (isLinear  ? spline.FirstValue.Y : GetMu(massCenter)) * mu0;
+                }
+
+            stiffnessMatrix = 1 / (mu) * stiffnessMatrix;
 
             for (int i = 0; i < basis.Length; i++)
                 for (int j = 0; j < basis.Length; j++)
@@ -194,6 +248,7 @@ public class FEM
             stiffnessMatrix.Clear();
             localVector.Fill(0);
         }
+        //globalVector = mu0 * globalVector;
     }
 
     void AssemblyLocallVector(int ielem)
@@ -266,17 +321,20 @@ public class FEM
         alphas[2, 2] = (vertices[1].X - vertices[0].X) / dD;
     }
 
-    private void AssemblyLocalMatrixes()
+    private void AssemblyLocalMatrixes(int ielem)
     {
         double dD = Math.Abs(DeterminantD());
         CalcuclateAlphas();
 
+       
         for (int i = 0; i < stiffnessMatrix.Size; i++)
             for (int j = 0; j < stiffnessMatrix.Size; j++)
             {
                 Func<Point2D, double> func = Sum(Mult(dbasisdx[i], dbasisdx[j]), Mult(dbasisdy[i], dbasisdy[j]));
-                stiffnessMatrix[i, j] = GaussTriangle(func);
-                //stiffnessMatrix[i, j] = func(new Point2D(0, 0));
+                if (basis.Length == 3)
+                    stiffnessMatrix[i, j] = func(new Point2D(0, 0)) / 2;
+                else
+                    stiffnessMatrix[i, j] = GaussTriangle(func);
             }
         stiffnessMatrix = dD * stiffnessMatrix;
     }
@@ -506,8 +564,41 @@ public class FEM
         return (AzAtPoint(point + new Point2D(0, hy)) - AzAtPoint(point - new Point2D(0, hy))) / (2.0 * hy);
     }
 
+    public double GetMu(Point2D point)
+    {
+        double B = CalculateBAtPoint(point);
+        return spline.ValueAtPoint(B);
+    }
+
     public double AbsBAtPoint(Point2D point)
     => Math.Sqrt(Math.Pow(ByAtPoint(point),2) + Math.Pow(BxAtPoint(point), 2));
+
+    public double CalculateBAtPoint(Point2D point)
+    {
+        var ielem = FindElement(point);
+        AssemblyLocalMatrixes(ielem);
+
+        var sqrModule = 0.0;
+
+        for (int i = 0; i < basis.Length; i++)
+        {
+            for (int j = 0; j < basis.Length; j++)
+            {
+                sqrModule += stiffnessMatrix[i, j] *
+                             solution[grid.Elements[ielem][i]] *
+                             solution[grid.Elements[ielem][j]];
+            }
+        }
+
+        var elementArea = Math.Abs(DeterminantD()) / 2.0;
+
+        sqrModule /= elementArea;
+
+        var module = Math.Sqrt(sqrModule);
+
+        // Console.WriteLine($"|B| at ({point.X}; {point.Y}) = {module}");
+        return module;
+    }
 
     public void PrintSolution()
     {

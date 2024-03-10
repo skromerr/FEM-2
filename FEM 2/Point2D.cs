@@ -1,4 +1,4 @@
-﻿namespace UMFCourseProject;
+﻿namespace FEM2;
 
 public class Point2D
 {
