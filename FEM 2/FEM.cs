@@ -22,6 +22,7 @@ public class FEM
     private Spline spline;
     private bool isLinear = true;
     (int maxIters, double eps, double delta) nonLinearParametres = (100, 1e-14, 1e-14);
+    (int maxIters, double eps) slaeParametres = (10000, 1e-14);
 
     public FEM(Grid grid)
     {
@@ -47,7 +48,7 @@ public class FEM
 
         stiffnessMatrix = new(basis.Length);
         localVector = new(basis.Length);
-        slae = new Solver(50000, 1e-14);
+        slae = new Solver(slaeParametres.maxIters, slaeParametres.eps);
 
 
 
@@ -76,6 +77,12 @@ public class FEM
         nonLinearParametres = (maxiters, eps, delta);
     }
 
+    public void SetSlaeParametres(int maxiters, double eps)
+    {
+        slaeParametres = (maxiters, eps);
+        slae.SetParametres(maxiters, eps);
+    }
+
     public void Compute()
     {
         int iter;
@@ -93,15 +100,18 @@ public class FEM
 
         double relax = 1;
 
-        for (iter = 1; iter < nonLinearParametres.maxIters; iter++)
+        for (iter = 1; iter <= nonLinearParametres.maxIters; iter++)
         {
             AssemblySLAE();
             AccountFirstConditions();
 
             residual = (globalMatrix * solution - globalVector).Norm() / globalVector.Norm();
             
-            if ((solution - solutionPrev).Norm() / solution.Norm() < nonLinearParametres.delta)
-                break;
+            //if ((solution - solutionPrev).Norm() / solution.Norm() < nonLinearParametres.delta)
+            //{
+            //    Console.WriteLine("Выход по стогнации");
+            //    break;
+            //}
 
             Vector.Copy(solution, solutionPrev);
 
@@ -116,9 +126,9 @@ public class FEM
         }
 
         //PrintSolution();
-        Console.WriteLine("Невязка");
+        Console.WriteLine("------------------Итог----------------\nНевязка");
         Console.WriteLine($"{residual:0.00E+0}");
-        Console.WriteLine($"Количество итераций\n{iter}");
+        Console.WriteLine($"Количество итераций\n{iter - 1}");
         Console.WriteLine();
     }
 
@@ -227,12 +237,13 @@ public class FEM
 
 
             mu = grid.Materials[grid.Elements[ielem][^1]].Mu * mu0;
-            if (grid.Elements[ielem][^1] == 1 && spline is not null)
+            if (grid.Elements[ielem][^1] == 1)
                 //if (ielem % 2 == 0)
                 {
-                    Point2D massCenter = (grid.Nodes[grid.Elements[ielem][0]] + grid.Nodes[grid.Elements[ielem][1]] + grid.Nodes[grid.Elements[ielem][2]]) / 3.0;
+                Point2D massCenter = (grid.Nodes[grid.Elements[ielem][0]] + grid.Nodes[grid.Elements[ielem][1]] + grid.Nodes[grid.Elements[ielem][2]]) / 3.0;
+                //Point2D massCenter = (grid.Nodes[grid.Elements[ielem][1]] + grid.Nodes[grid.Elements[ielem][2]]) / 2.0;
 
-                    mu = (isLinear  ? spline.FirstValue.Y : GetMu(massCenter)) * mu0;
+                    mu = (isLinear ? mu : GetMu(massCenter) * mu0);
                 }
 
             stiffnessMatrix = 1 / (mu) * stiffnessMatrix;
@@ -331,10 +342,10 @@ public class FEM
             for (int j = 0; j < stiffnessMatrix.Size; j++)
             {
                 Func<Point2D, double> func = Sum(Mult(dbasisdx[i], dbasisdx[j]), Mult(dbasisdy[i], dbasisdy[j]));
-                if (basis.Length == 3)
-                    stiffnessMatrix[i, j] = func(new Point2D(0, 0)) / 2;
-                else
-                    stiffnessMatrix[i, j] = GaussTriangle(func);
+                //if (basis.Length == 3)
+                //    stiffnessMatrix[i, j] = func(new Point2D(0, 0)) / 2;
+                //else
+                stiffnessMatrix[i, j] = GaussTriangle(func);
             }
         stiffnessMatrix = dD * stiffnessMatrix;
     }
@@ -566,7 +577,7 @@ public class FEM
 
     public double GetMu(Point2D point)
     {
-        double B = CalculateBAtPoint(point);
+        double B = AbsBAtPoint(point);
         return spline.ValueAtPoint(B);
     }
 

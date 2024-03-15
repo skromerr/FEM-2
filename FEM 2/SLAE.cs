@@ -26,6 +26,13 @@ public class Solver
         Solve = CGM;
     }
 
+    public void SetParametres(int maxIter, double eps)
+    {
+        this.eps = eps;
+        this.maxIter = maxIter;
+    }
+
+
     public void SetSLAE(Vector vector, Matrix matrix)
     {
         this.vector = vector;

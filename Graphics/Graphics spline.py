@@ -19,7 +19,7 @@ with open("mu") as file:
 # plot
 fig, ax = plt.subplots()
 
-plt.plot(x, y, 'y')
+plt.plot(x, y, 'r')
 plt.plot(xReal, yReal, '--w')
 plt.title('Mu by |B|')
 plt.xlabel('|B|')

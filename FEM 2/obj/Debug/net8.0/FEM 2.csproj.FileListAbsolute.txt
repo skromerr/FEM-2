@@ -27,3 +27,5 @@ C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\refint\FEM 2.dll
 C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.pdb
 C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\FEM 2.genruntimeconfig.cache
 C:\Users\Skromer\source\repos\FEM-2\FEM 2\obj\Debug\net8.0\ref\FEM 2.dll
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\bin\Debug\net8.0\mu
+C:\Users\Skromer\source\repos\FEM-2\FEM 2\bin\Debug\net8.0\test.txt
